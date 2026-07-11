@@ -2,18 +2,19 @@
 
 import React, { useEffect, useState } from "react";
 import Papa from "papaparse";
-import { X, FileText } from "lucide-react";
+import { X, FileText, AlertCircle } from "lucide-react";
 
 interface PreviewTableProps {
   file: File;
   onCancel: () => void;
   onConfirm: () => void;
+  submitError?: string | null;
 }
 
-export function PreviewTable({ file, onCancel, onConfirm }: PreviewTableProps) {
+export function PreviewTable({ file, onCancel, onConfirm, submitError }: PreviewTableProps) {
   const [data, setData] = useState<any[]>([]);
   const [headers, setHeaders] = useState<string[]>([]);
-  const [error, setError] = useState<string | null>(null);
+  const [parseError, setParseError] = useState<string | null>(null);
 
   useEffect(() => {
     Papa.parse(file, {
@@ -21,14 +22,14 @@ export function PreviewTable({ file, onCancel, onConfirm }: PreviewTableProps) {
       skipEmptyLines: true,
       complete: (results) => {
         if (results.errors && results.errors.length > 0) {
-          setError(results.errors[0].message);
+          setParseError(results.errors[0].message);
         } else {
           setHeaders(results.meta.fields || []);
           setData(results.data);
         }
       },
       error: (error) => {
-        setError(error.message);
+        setParseError(error.message);
       }
     });
   }, [file]);
@@ -41,7 +42,7 @@ export function PreviewTable({ file, onCancel, onConfirm }: PreviewTableProps) {
 
   return (
     <div 
-      className="w-full max-w-6xl mx-auto bg-white rounded-[var(--radius-lg)] border border-border shadow-sm flex flex-col h-[calc(100vh-6rem)] md:h-[calc(100vh-8rem)]"
+      className="w-full max-w-6xl mx-auto bg-white rounded-[var(--radius-lg)] border border-border shadow-sm flex flex-col h-[calc(100vh-6rem)] md:h-[calc(100vh-8rem)] animate-in fade-in zoom-in-95 duration-200"
       role="dialog"
       aria-labelledby="preview-modal-title"
     >
@@ -64,23 +65,35 @@ export function PreviewTable({ file, onCancel, onConfirm }: PreviewTableProps) {
       </div>
 
       {/* Subheader */}
-      <div className="flex items-center justify-between px-6 py-3 border-b border-border bg-[#fafafa] shrink-0">
-        <h3 className="text-[11px] font-semibold text-on-background tracking-wider uppercase">
-          PREVIEW — {data.length} ROWS DETECTED
-        </h3>
-        <div className="flex items-center gap-2 text-[12px] font-medium text-muted">
-          <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_4px_rgba(16,185,129,0.4)]"></span>
-          Raw Data Preview
+      <div className="flex flex-col border-b border-border bg-[#fafafa] shrink-0">
+        <div className="flex items-center justify-between px-6 py-3">
+          <h3 className="text-[11px] font-semibold text-on-background tracking-wider uppercase">
+            PREVIEW — {data.length} ROWS DETECTED
+          </h3>
+          <div className="flex items-center gap-2 text-[12px] font-medium text-muted">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_4px_rgba(16,185,129,0.4)]"></span>
+            Raw Data Preview
+          </div>
         </div>
+        
+        {/* Backend Submission Error Banner */}
+        {submitError && (
+          <div className="px-6 py-3 bg-error-container/50 border-t border-error/20 flex items-start gap-2.5 text-on-error-container text-[13px]" role="alert">
+            <AlertCircle size={16} className="shrink-0 mt-0.5" strokeWidth={2.5} />
+            <div>
+              <span className="font-bold">Import failed:</span> {submitError}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Table Body (Scrollable) */}
       <div className="flex-1 overflow-auto bg-white min-h-0 relative">
-        {error ? (
+        {parseError ? (
           <div className="p-10 flex items-center justify-center h-full">
             <div className="text-error bg-error-container/50 px-6 py-4 rounded-lg border border-error/20 flex flex-col items-center">
                <span className="font-medium">Failed to parse CSV</span>
-               <span className="text-sm mt-1">{error}</span>
+               <span className="text-sm mt-1">{parseError}</span>
             </div>
           </div>
         ) : (
@@ -110,7 +123,7 @@ export function PreviewTable({ file, onCancel, onConfirm }: PreviewTableProps) {
                   ))}
                 </tr>
               ))}
-              {data.length === 0 && !error && (
+              {data.length === 0 && !parseError && (
                 <tr>
                   <td colSpan={headers.length + 1} className="p-12 text-center text-muted text-[13px]">
                     <div className="flex flex-col items-center animate-pulse">
@@ -135,7 +148,8 @@ export function PreviewTable({ file, onCancel, onConfirm }: PreviewTableProps) {
         </button>
         <button 
           onClick={onConfirm}
-          className="px-4 py-2 text-[14px] font-medium text-on-primary bg-primary rounded-[var(--radius-btn)] hover:opacity-90 transition-all focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1"
+          disabled={data.length === 0}
+          className="px-4 py-2 text-[14px] font-medium text-on-primary bg-primary rounded-[var(--radius-btn)] hover:opacity-90 transition-all focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Confirm Import
         </button>

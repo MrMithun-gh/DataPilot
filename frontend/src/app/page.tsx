@@ -3,21 +3,67 @@
 import { useState } from "react";
 import { UploadDropzone } from "@/components/UploadDropzone";
 import { PreviewTable } from "@/components/PreviewTable";
+import { ProcessingState } from "@/components/ProcessingState";
+import { ResultTable } from "@/components/ResultTable";
 import { FileUp } from "lucide-react";
+
+type ImportState = "upload" | "preview" | "processing" | "result";
 
 export default function Home() {
   const [file, setFile] = useState<File | null>(null);
+  const [importState, setImportState] = useState<ImportState>("upload");
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [importResult, setImportResult] = useState<any>(null);
 
   const handleUpload = (uploadedFile: File) => {
     setFile(uploadedFile);
+    setSubmitError(null);
+    setImportState("preview");
   };
 
   const handleCancel = () => {
     setFile(null);
+    setSubmitError(null);
+    setImportResult(null);
+    setImportState("upload");
   };
 
-  const handleConfirm = () => {
-    alert("Import confirmed (backend call skipped based on instructions).");
+  const handleConfirm = async () => {
+    if (!file) return;
+    
+    setImportState("processing");
+    setSubmitError(null);
+    
+    const formData = new FormData();
+    formData.append("file", file);
+    
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+      if (!apiUrl) throw new Error("NEXT_PUBLIC_API_URL is not configured.");
+      
+      const res = await fetch(`${apiUrl}/api/import`, {
+        method: "POST",
+        body: formData,
+      });
+      
+      let data;
+      try {
+        data = await res.json();
+      } catch (parseError) {
+        throw new Error("Received an invalid response from the server.");
+      }
+      
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to import leads. Please try again.");
+      }
+      
+      // Success
+      setImportResult(data);
+      setImportState("result");
+    } catch (err: any) {
+      setSubmitError(err.message || "An unexpected error occurred while communicating with the server.");
+      setImportState("preview");
+    }
   };
 
   return (
@@ -63,13 +109,32 @@ export default function Home() {
         {/* Content Area */}
         <div className="flex-1 overflow-auto relative p-6 md:p-12 flex flex-col items-center">
           <div className="w-full flex-1 flex flex-col items-center justify-center min-h-[500px]">
-            {!file ? (
+            {importState === "upload" && (
               <div className="w-full flex justify-center">
                 <UploadDropzone onUpload={handleUpload} onCancel={handleCancel} />
               </div>
-            ) : (
+            )}
+            
+            {importState === "preview" && (
               <div className="w-full flex justify-center">
-                <PreviewTable file={file} onCancel={handleCancel} onConfirm={handleConfirm} />
+                <PreviewTable 
+                  file={file!} 
+                  onCancel={handleCancel} 
+                  onConfirm={handleConfirm} 
+                  submitError={submitError} 
+                />
+              </div>
+            )}
+
+            {importState === "processing" && (
+              <div className="w-full flex justify-center">
+                <ProcessingState />
+              </div>
+            )}
+
+            {importState === "result" && (
+              <div className="w-full flex justify-center h-full">
+                <ResultTable data={importResult} onReset={handleCancel} />
               </div>
             )}
           </div>
