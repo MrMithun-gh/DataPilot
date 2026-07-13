@@ -8,6 +8,9 @@ DataPilot is an AI-powered CSV-to-CRM import tool that leverages OpenAI structur
 - **Polished UI**: Modern, responsive interface built with Next.js, Tailwind v4, and Lucide Icons, mimicking production-grade enterprise software.
 - **Resilient Batch Processing**: AI extraction happens in controlled batches with built-in concurrency limits and automatic retry backoff.
 - **Clear Result Reporting**: Easily review Successfully Imported vs Skipped rows, complete with backend rejection reasons and raw JSON payloads.
+- **UI Enhancements**: Includes a Dark/Light theme toggle and local storage-based Import History.
+- **CSV Export**: Users can download successfully imported and mapped records directly as a clean CSV.
+- **Code-Level Deterministic Safety**: Complements AI extraction with deterministic country code inference and strict regex-based data hygiene.
 
 ## Tech Stack
 - **Frontend**: Next.js 15 (App Router), React, Tailwind CSS v4, PapaParse

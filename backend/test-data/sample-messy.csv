@@ -1,3 +1,3 @@
-Customer Name,Cell,Mail ID,City,Remarks
-John Doe,5551234,john@example.com,New York,Wants a callback
-Jane Smith,9876543,jane@example.com,Los Angeles,Follow up next week
+Name,Email 1,Mobile 1,Company,Source
+Rahul,rahul@example.com,+91 9876543210,Acme Corp,Website
+John Doe,john@test.com,+1 2025550123,Globex,Google Ads

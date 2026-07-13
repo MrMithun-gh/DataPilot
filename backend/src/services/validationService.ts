@@ -53,6 +53,11 @@ export const validateAndFilterRecords = (rawRecords: any[], originalRowsMap: any
 
     const record = parseResult.data as CrmRecord;
 
+    // Enforce safety net unconditionally:
+    record.crm_note = record.crm_note
+      .replace(/(?:\n)?Unidentified Source: [^\n]*/g, '')
+      .replace(/^\n/, '');
+
     // Apply the EXACT skip rule
     const skip = (record.email === "") && (record.mobile_without_country_code === "");
 

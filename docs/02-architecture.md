@@ -29,13 +29,17 @@ Batches sent to OpenAI in parallel (with concurrency cap)
     ↓
 AI returns structured JSON
     ↓
-Zod validation
+Zod validation & regex safety nets
+    ↓
+Deterministic Enrichment (e.g., inferring country from country code)
     ↓
 Skip rule applied
     ↓
 Response assembled
     ↓
-Frontend renders imported/skipped results
+Frontend renders imported/skipped results (and optionally saves to local history)
+    ↓
+User optionally exports imported records to CSV
 ```
 
 ## Tech Stack

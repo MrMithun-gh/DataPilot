@@ -3,6 +3,7 @@ import csv from 'csv-parser';
 import { Readable } from 'stream';
 import { processCsvImport } from '../services/aiService';
 import { validateAndFilterRecords } from '../services/validationService';
+import { inferCountryFromCode } from '../utils/countryFromCode';
 
 export const handleImport = async (req: Request, res: Response) => {
   try {
@@ -45,6 +46,16 @@ export const handleImport = async (req: Request, res: Response) => {
               // Validate AI-extracted records with Zod and apply the skip rule
               const validationResult = validateAndFilterRecords(batch.records, batch.originalRows);
               
+              // Enrich country deterministically if missing and unambiguous
+              validationResult.imported.forEach(record => {
+                if (record.country_code && !record.country) {
+                  const inferred = inferCountryFromCode(record.country_code);
+                  if (inferred) {
+                    record.country = inferred;
+                  }
+                }
+              });
+
               imported.push(...validationResult.imported);
               importedCount += validationResult.imported.length;
               

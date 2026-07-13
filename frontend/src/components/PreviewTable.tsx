@@ -12,7 +12,7 @@ interface PreviewTableProps {
 }
 
 export function PreviewTable({ file, onCancel, onConfirm, submitError }: PreviewTableProps) {
-  const [data, setData] = useState<any[]>([]);
+  const [data, setData] = useState<Record<string, unknown>[]>([]);
   const [headers, setHeaders] = useState<string[]>([]);
   const [parseError, setParseError] = useState<string | null>(null);
 
@@ -25,7 +25,7 @@ export function PreviewTable({ file, onCancel, onConfirm, submitError }: Preview
           setParseError(results.errors[0].message);
         } else {
           setHeaders(results.meta.fields || []);
-          setData(results.data);
+          setData(results.data as Record<string, unknown>[]);
         }
       },
       error: (error) => {
@@ -42,13 +42,13 @@ export function PreviewTable({ file, onCancel, onConfirm, submitError }: Preview
 
   return (
     <div 
-      className="w-full max-w-6xl mx-auto bg-white rounded-[var(--radius-lg)] border border-border shadow-sm flex flex-col h-[calc(100vh-6rem)] md:h-[calc(100vh-8rem)] animate-in fade-in zoom-in-95 duration-200"
+      className="w-full max-w-6xl mx-auto bg-white dark:bg-[#18181b] rounded-[var(--radius-lg)] border border-border shadow-sm flex flex-col h-[calc(100vh-6rem)] md:h-[calc(100vh-8rem)] animate-in fade-in zoom-in-95 duration-200"
       role="dialog"
       aria-labelledby="preview-modal-title"
     >
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-border shrink-0">
-        <div className="flex items-center gap-3 bg-[#fafafa] px-3 py-1.5 rounded-[var(--radius-btn)] border border-border max-w-[80%] overflow-hidden">
+        <div className="flex items-center gap-3 bg-[#fafafa] dark:bg-[#09090b] px-3 py-1.5 rounded-[var(--radius-btn)] border border-border max-w-[80%] overflow-hidden">
           <FileText size={16} className="text-muted shrink-0" strokeWidth={2} />
           <span className="text-[13px] font-medium text-on-background truncate" id="preview-modal-title" title={file.name}>
             {file.name}
@@ -65,7 +65,7 @@ export function PreviewTable({ file, onCancel, onConfirm, submitError }: Preview
       </div>
 
       {/* Subheader */}
-      <div className="flex flex-col border-b border-border bg-[#fafafa] shrink-0">
+      <div className="flex flex-col border-b border-border bg-[#fafafa] dark:bg-[#09090b] shrink-0">
         <div className="flex items-center justify-between px-6 py-3">
           <h3 className="text-[11px] font-semibold text-on-background tracking-wider uppercase">
             PREVIEW — {data.length} ROWS DETECTED
@@ -88,7 +88,7 @@ export function PreviewTable({ file, onCancel, onConfirm, submitError }: Preview
       </div>
 
       {/* Table Body (Scrollable) */}
-      <div className="flex-1 overflow-auto bg-white min-h-0 relative">
+      <div className="flex-1 overflow-auto bg-white dark:bg-[#18181b] min-h-0 relative">
         {parseError ? (
           <div className="p-10 flex items-center justify-center h-full">
             <div className="text-error bg-error-container/50 px-6 py-4 rounded-lg border border-error/20 flex flex-col items-center">
@@ -98,7 +98,7 @@ export function PreviewTable({ file, onCancel, onConfirm, submitError }: Preview
           </div>
         ) : (
           <table className="w-full text-left border-collapse min-w-[800px]">
-            <thead className="sticky top-0 bg-[#fafafa] shadow-[0_1px_0_var(--color-border)] z-10">
+            <thead className="sticky top-0 bg-[#fafafa] dark:bg-[#09090b] shadow-[0_1px_0_var(--color-border)] z-10">
               <tr>
                 <th className="px-6 py-3 text-[11px] font-semibold text-muted uppercase tracking-wider w-[50px] border-r border-border/50">
                   #
@@ -112,13 +112,13 @@ export function PreviewTable({ file, onCancel, onConfirm, submitError }: Preview
             </thead>
             <tbody className="divide-y divide-border">
               {data.map((row, index) => (
-                <tr key={index} className="hover:bg-[#fafafa]/50 transition-colors">
-                  <td className="px-6 py-2.5 text-[12px] text-muted italic border-r border-border/50 bg-[#fafafa]/30">
+                <tr key={index} className="hover:bg-[#fafafa] dark:bg-[#09090b]/50 transition-colors">
+                  <td className="px-6 py-2.5 text-[12px] text-muted italic border-r border-border/50 bg-[#fafafa] dark:bg-[#09090b]/30">
                     {index + 1}
                   </td>
                   {headers.map((header) => (
                     <td key={header} className="px-6 py-2.5 text-[13px] text-on-background whitespace-nowrap max-w-[250px] overflow-hidden text-ellipsis">
-                      {row[header] || <span className="text-muted/40 italic">Empty</span>}
+                      {(row[header] as string) || <span className="text-muted/40 italic">Empty</span>}
                     </td>
                   ))}
                 </tr>
@@ -139,10 +139,10 @@ export function PreviewTable({ file, onCancel, onConfirm, submitError }: Preview
       </div>
 
       {/* Footer */}
-      <div className="px-6 py-4 border-t border-border flex justify-end gap-3 bg-white rounded-b-[var(--radius-lg)] shrink-0">
+      <div className="px-6 py-4 border-t border-border flex justify-end gap-3 bg-white dark:bg-[#18181b] rounded-b-[var(--radius-lg)] shrink-0">
         <button 
           onClick={onCancel}
-          className="px-4 py-2 text-[14px] font-medium text-on-background bg-white border border-border rounded-[var(--radius-btn)] hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1"
+          className="px-4 py-2 text-[14px] font-medium text-on-background bg-white dark:bg-[#18181b] border border-border rounded-[var(--radius-btn)] hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1"
         >
           Cancel
         </button>

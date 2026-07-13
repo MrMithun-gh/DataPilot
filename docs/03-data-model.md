@@ -24,6 +24,10 @@ export type CrmRecord = {
 
 ## Business Rules
 
+### Deterministic Enrichment & Safety Nets (Code-Level)
+- **Country Inference:** If `country_code` is extracted and `country` is missing, the backend deterministically infers the country name for unambiguous codes (e.g., `+91` -> `India`, `+44` -> `United Kingdom`).
+- **Source Stripping:** A post-processing regex unconditionally strips `Unidentified Source: ...` from `crm_note` to ensure unmatched sources are discarded, overriding any non-deterministic AI behavior.
+
 ### `crm_status`
 - **Allowed values are ONLY:**
   - `GOOD_LEAD_FOLLOW_UP`

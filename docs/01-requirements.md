@@ -9,6 +9,11 @@ Users upload CSVs with arbitrary and inconsistent column headers from various so
 3. **Confirm Import:** The user confirms the import. Only at this point does the AI and backend get involved for processing.
 4. **Result:** The system displays the final results, showing both imported and skipped records.
 
+## Additional UI Features
+- **Dark/Light Theme Toggle:** The UI supports switching between dark and light modes.
+- **Import History:** Recent successful imports are saved in the browser's local storage and can be viewed or cleared.
+- **CSV Export:** Processed records can be downloaded as a new CSV file directly from the results page.
+
 ## Target CRM Fields
 The output must map to these 15 exact fields:
 - `created_at`

@@ -100,14 +100,14 @@ export function UploadDropzone({ onUpload, onCancel }: UploadDropzoneProps) {
 
   return (
     <div 
-      className="w-full max-w-[640px] bg-white rounded-xl border border-border shadow-[0_4px_24px_rgba(0,0,0,0.04)] flex flex-col mx-auto"
+      className="w-full max-w-[640px] bg-white dark:bg-[#18181b] rounded-xl border border-border dark:border-[#27272a] shadow-[0_4px_24px_rgba(0,0,0,0.04)] flex flex-col mx-auto"
       role="dialog"
       aria-labelledby="upload-modal-title"
     >
       {/* Header */}
       <div className="flex items-center justify-between px-7 py-5 border-b border-border shrink-0">
         <div>
-          <h2 id="upload-modal-title" className="text-[18px] font-semibold text-on-background leading-tight">
+          <h2 id="upload-modal-title" className="text-[18px] font-semibold text-on-background dark:text-white leading-tight">
             Import Leads via CSV
           </h2>
           <p className="text-[14px] text-muted mt-1">
@@ -128,7 +128,7 @@ export function UploadDropzone({ onUpload, onCancel }: UploadDropzoneProps) {
         {/* Dropzone */}
         <div
           className={`relative border-2 border-dashed rounded-xl px-6 py-14 flex flex-col items-center justify-center transition-all cursor-pointer focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2
-            ${dragActive ? "border-primary bg-primary/5" : "border-gray-300 hover:border-primary/50 bg-[#fafafa]/50"}
+            ${dragActive ? "border-primary bg-primary/5" : "border-gray-300 dark:border-[#3f3f46] hover:border-primary/50 bg-[#fafafa]/50 dark:bg-[#09090b]/50"}
           `}
           onDragEnter={handleDrag}
           onDragLeave={handleDrag}
@@ -155,7 +155,7 @@ export function UploadDropzone({ onUpload, onCancel }: UploadDropzoneProps) {
               <div className="bg-primary/10 p-3.5 rounded-xl mb-4 text-primary">
                 <CloudUpload size={32} strokeWidth={2} />
               </div>
-              <p className="text-[16px] font-semibold text-on-background">
+              <p className="text-[16px] font-semibold text-on-background dark:text-white">
                 Drop your CSV file here
               </p>
               <p className="text-[14px] text-muted mt-1">
@@ -170,7 +170,7 @@ export function UploadDropzone({ onUpload, onCancel }: UploadDropzoneProps) {
               <div className="bg-primary/10 p-3.5 rounded-xl mb-4 text-primary">
                 <CloudUpload size={32} strokeWidth={2} />
               </div>
-              <p className="text-[16px] font-semibold text-on-background truncate max-w-xs sm:max-w-md px-4 text-center">
+              <p className="text-[16px] font-semibold text-on-background dark:text-white truncate max-w-xs sm:max-w-md px-4 text-center">
                 {selectedFile.name}
               </p>
               <p className="text-[14px] text-muted mt-1">
@@ -202,18 +202,18 @@ export function UploadDropzone({ onUpload, onCancel }: UploadDropzoneProps) {
         )}
 
         {/* Requirements Info */}
-        <div className="bg-[#fafafa] rounded-xl p-5 border border-border">
+        <div className="bg-[#fafafa] dark:bg-[#09090b] rounded-xl p-5 border border-border dark:border-[#27272a]">
           <div className="flex gap-3.5">
             <Info size={20} className="text-muted shrink-0 mt-0.5" strokeWidth={2} />
             <div>
-              <p className="text-[14px] font-semibold text-on-background">
+              <p className="text-[14px] font-semibold text-on-background dark:text-white">
                 Required CSV Headers:
               </p>
               <div className="flex flex-wrap gap-2 mt-3">
                 {["Customer Name", "Mail ID", "Cell", "Company Name"].map((header) => (
                   <span
                     key={header}
-                    className="bg-white border border-border px-3 py-1 rounded-md text-[13px] font-mono text-muted shadow-sm"
+                    className="bg-white dark:bg-[#18181b] border border-border dark:border-[#27272a] px-3 py-1 rounded-md text-[13px] font-mono text-muted shadow-sm"
                   >
                     {header}
                   </span>
@@ -232,10 +232,10 @@ export function UploadDropzone({ onUpload, onCancel }: UploadDropzoneProps) {
       </div>
 
       {/* Footer */}
-      <div className="px-7 py-5 border-t border-border flex justify-end gap-3 bg-white rounded-b-xl shrink-0">
+      <div className="px-7 py-5 border-t border-border dark:border-[#27272a] flex justify-end gap-3 bg-white dark:bg-[#18181b] rounded-b-xl shrink-0">
         <button 
           onClick={handleClose}
-          className="px-5 py-2.5 text-[14px] font-medium text-on-background bg-white border border-border rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 transition-all shadow-sm"
+          className="px-5 py-2.5 text-[14px] font-medium text-on-background dark:text-white bg-white dark:bg-[#18181b] border border-border dark:border-[#27272a] rounded-lg hover:bg-gray-50 dark:hover:bg-[#27272a] focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 transition-all shadow-sm"
           type="button"
         >
           Cancel

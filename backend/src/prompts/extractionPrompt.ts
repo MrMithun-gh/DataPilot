@@ -28,6 +28,12 @@ Allowed values ONLY:
 - BAD_LEAD
 - SALE_DONE
 
+MAPPING INSTRUCTIONS:
+- If the source status indicates "Interested" or "Follow Up", map it to "GOOD_LEAD_FOLLOW_UP".
+- If the source status indicates "Sale Done", map it to "SALE_DONE".
+- If the source status indicates "Bad Lead", map it to "BAD_LEAD".
+- If the source status indicates "Did Not Connect", map it to "DID_NOT_CONNECT".
+
 If you are uncertain or the source cannot be confidently mapped to one of these, return an empty string (""). Never invent another value.
 
 2. data_source
@@ -38,26 +44,45 @@ Allowed values ONLY:
 - varah_swamy
 - sarjapur_plots
 
-If you are uncertain or the source cannot be confidently mapped to one of these, return an empty string (""). Never invent another value.
+These 5 values are specific real-estate project/campaign codenames.
+- If the row's source/data-source-related column value exactly matches one of the 5 allowed values (ignoring leading/trailing whitespace and case), set data_source to that value.
+- If it does NOT match, leave data_source as an empty string (""). Do NOT add anything about source to crm_note. The raw source value should simply not be captured.
 
 3. Multi-email rule
 If a row contains multiple email addresses:
 - The first email goes into the 'email' field.
-- Every remaining email address is appended to 'crm_note'.
+- Every remaining email address is appended to 'crm_note', prefixed with "Alternative Mail: " (respecting the GENERAL APPENDING RULE below).
 
 4. Multi-mobile rule
 If a row contains multiple phone numbers:
 - The first phone number goes into 'mobile_without_country_code'.
-- Every remaining phone number is appended into 'crm_note'.
+- Every remaining phone number is appended into 'crm_note', prefixed with "Alternative Mob No: " (respecting the GENERAL APPENDING RULE below).
 
-5. crm_note newline escaping rule
+5. GENERAL crm_note APPENDING RULE
+Any time you append distinct pieces of information into crm_note (e.g. original remarks, unmatched source, extra emails, extra phones), EVERY distinct piece of information MUST be on its own separate line and MUST be clearly labeled with a heading:
+- For original remarks/notes, prefix with "Remark: "
+- For extra emails, prefix with "Alternative Mail: "
+- For extra phones, prefix with "Alternative Mob No: "
+
+CRITICAL: Do not split a single multi-line value (e.g., from a Remarks column) into multiple different fields. If a remark contains a line break, preserve it using \\n as one continuous remark under 'Remark: ', and do NOT mistake the text after the line break for an email or phone number.
+
+Join them unconditionally using the literal two-character sequence "\\n". Never concatenate them directly together without a separator.
+For example, if the source has a note and an extra email, the result MUST be: "Remark: Call back\\nAlternative Mail: alt@test.com".
+
+6. crm_note newline escaping rule
 'crm_note' must never contain literal newline characters.
 If source text contains multiple lines (for example Remarks or Notes), replace every newline with the literal two-character sequence: \\n (so exported CSV rows always remain single-line).
 
-6. created_at rule
+7. created_at rule
 Must produce a value that satisfies new Date(value) in JavaScript.
 If no usable date exists in the source row, output an empty string ("").
 Never fabricate a date.
+
+8. Phone numbers and Country
+When extracting a phone number, you MUST separate the country code from the local number.
+- If the number contains a country code (like +91 or starts with 91 followed by 10 digits), set country_code to "+91" (MUST INCLUDE the + sign) and mobile_without_country_code to strictly the local number (e.g., "9876543210" - no country code digits).
+- If no country code is explicitly provided but it's a standard 10-digit number in an Indian context, assume country_code is "+91".
+- Whenever country_code is populated (e.g., "+91" or "+1"), you MUST also populate the country field with the corresponding country name (e.g., "India" or "United States").
 
 # WORKED EXAMPLES
 
@@ -144,9 +169,42 @@ Expected Output:
   "country": "",
   "lead_owner": "",
   "crm_status": "",
-  "crm_note": "Additional phone: 4445556666",
+  "crm_note": "Alternative Mob No: 4445556666",
   "data_source": "",
   "possession_time": "",
   "description": ""
 }
+
+--- Example 4 ---
+Scenario: Generic ad platform in source column AND existing remarks AND extra phone AND extra email
+
+Source Row:
+{
+  "Source": "Google Ads",
+  "Notes": "Customer called",
+  "Email 1": "primary@example.com",
+  "Email 2": "alt.email@gmail.com",
+  "Mobile 1": "5551234",
+  "Mobile 2": "9998887777"
+}
+
+Expected Output:
+{
+  "created_at": "",
+  "name": "",
+  "email": "primary@example.com",
+  "country_code": "",
+  "mobile_without_country_code": "5551234",
+  "company": "",
+  "city": "",
+  "state": "",
+  "country": "",
+  "lead_owner": "",
+  "crm_status": "",
+  "crm_note": "Remark: Customer called\\nAlternative Mail: alt.email@gmail.com\\nAlternative Mob No: 9998887777",
+  "data_source": "",
+  "possession_time": "",
+  "description": ""
+}
+
 `;
